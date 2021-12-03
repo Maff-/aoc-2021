@@ -38,3 +38,33 @@ for ($i = 0; $i < $bits; $i++) {
 $epsilon = $gamma ^ $mask;
 
 echo '[Part 1] Submarine power consumption: ', ($gamma * $epsilon), \PHP_EOL;
+
+// Part 2
+
+$o = null;
+$candidates = $input;
+for ($i = 0; $i < $bits; $i++) {
+    $count = count($candidates);
+    $nSum = array_sum(array_column($candidates, $i));
+    $mostCommon = (int)($nSum / $count >= 0.5);
+    $candidates = array_filter($candidates, static fn (array $value) => $value[$i] === $mostCommon);
+    if (count($candidates) === 1) {
+        $o = bindec(implode('', current($candidates)));
+        break;
+    }
+}
+
+$co2 = null;
+$candidates = $input;
+for ($i = 0; $i < $bits; $i++) {
+    $count = count($candidates);
+    $nSum = array_sum(array_column($candidates, $i));
+    $mostCommon = (int)($nSum / $count < 0.5);
+    $candidates = array_filter($candidates, static fn (array $value) => $value[$i] === $mostCommon);
+    if (count($candidates) === 1) {
+        $co2 = bindec(implode('', current($candidates)));
+        break;
+    }
+}
+
+echo '[Part 2] Life support rating of the submarine: ', ($o * $co2), \PHP_EOL;
