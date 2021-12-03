@@ -41,3 +41,28 @@ foreach ($input as [$direction, $units]) {
 }
 
 echo '[Part 1] Final horizontal position times final depth: ', ($depth * $pos), \PHP_EOL;
+
+// Part 2
+
+$depth = 0;
+$pos = 0;
+$aim = 0;
+
+foreach ($input as [$direction, $units]) {
+    switch ($direction) {
+        case 'down':
+            $aim += $units;
+            break;
+        case 'up':
+            $aim -= $units;
+            break;
+        case 'forward':
+            $pos += $units;
+            $depth += $aim * $units;
+            break;
+        default:
+            throw new \RuntimeException(sprintf('Invalid direction "%s"', $direction));
+    }
+}
+
+echo '[Part 2] Final horizontal position times final depth: ', ($depth * $pos), \PHP_EOL;
