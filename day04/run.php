@@ -33,6 +33,7 @@ $numbers = array_map('intval', explode(',', array_shift($input)));
 $cards = array_map(static function (array $lines) use ($size) {
     return array_map(static fn (string $line) => array_map('intval', preg_split('/\s+/', trim($line))), array_slice($lines, 1));
 }, array_chunk($input, $size + 1));
+$cardsBackup = $cards;
 
 // Part 1
 
@@ -86,3 +87,58 @@ if ($winningCard === null) {
 $sumOfUnmarkedNumbers = array_sum(array_map('array_sum', $cards[$winningCard]));
 
 echo '[Part 1] Final score: ', ($sumOfUnmarkedNumbers * $lastNumber), \PHP_EOL;
+
+// Part 2
+
+$cards = $cardsBackup;
+$cardCount = count($cards);
+$winningCards = [];
+$lastNumber = null;
+
+foreach ($numbers as $number) {
+//    echo 'Number drawn: ', $number, PHP_EOL;
+    $lastNumber = $number;
+    foreach ($cards as $n => $card) {
+        if (in_array($n, $winningCards, true)) {
+            continue;
+        }
+//        echo 'Checking card #', $n, PHP_EOL;
+        foreach ($card as $row => $values) {
+            foreach ($values as $col => $value) {
+                if ($number === $value) {
+                    $cards[$n][$row][$col] = null;
+                    break 2;
+                }
+            }
+        }
+        // check for bingo
+        foreach ($cards[$n] as $row => $values) {
+            if (array_all_null($values)) {
+                $winningCard = $n;
+                $winningCards[] = $n;
+//                echo sprintf('Bingo at card #%d, row %d complete', $n, $row), PHP_EOL;
+                continue 2;
+            }
+        }
+        $cols = array_map(null, ...$cards[$n]); // transpose matrix
+        foreach ($cols as $col => $values) {
+            if (array_all_null($values)) {
+                $winningCard = $n;
+                $winningCards[] = $n;
+//                echo sprintf('Bingo at card #%d, col %d complete', $n, $col), PHP_EOL;
+                continue 2;
+            }
+        }
+    }
+    if (count($winningCards) === $cardCount) {
+        break 1;
+    }
+}
+
+if ($winningCard === null) {
+    throw new \RuntimeException('Failed to find winning card');
+}
+
+$sumOfUnmarkedNumbers = array_sum(array_map('array_sum', $cards[$winningCard]));
+
+echo '[Part 2] Final score (card #', $winningCard ,'): ', ($sumOfUnmarkedNumbers * $lastNumber), \PHP_EOL;
