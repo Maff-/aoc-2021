@@ -48,3 +48,29 @@ foreach ($input as [$a, $b]) {
 $overlaps = array_sum(array_map(static fn (array $row) => count(array_filter($row, static fn (int $value): bool => $value >= 2)), $map));
 
 echo '[Part 1] Number of points where at least two lines overlap: ', $overlaps, \PHP_EOL;
+
+// Part 2
+
+$map = [];
+
+foreach ($input as [$a, $b]) {
+    [$x1, $y1, $x2, $y2] = [...$a, ...$b];
+//    echo sprintf('[%2d,%2d] -> [%2d, %2d]', $x1, $y1, $x2, $y2), \PHP_EOL;
+    $dX = $x2 <=> $x1;
+    $dY = $y2 <=> $y1;
+    $x = $x1;
+    $y = $y1;
+    while (true) {
+//        echo '[',$x,',',$y,']', \PHP_EOL;
+        $map[$y][$x] = ($map[$y][$x] ?? 0) + 1;
+        if ($x === $x2 && $y === $y2) {
+            break;
+        }
+        $x += $dX;
+        $y += $dY;
+    }
+}
+
+$overlaps = array_sum(array_map(static fn (array $row) => count(array_filter($row, static fn (int $value): bool => $value >= 2)), $map));
+
+echo '[Part 2] Number of points where at least two lines overlap: ', $overlaps, \PHP_EOL;
