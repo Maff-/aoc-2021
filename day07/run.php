@@ -43,21 +43,12 @@ $lookup = [
     // ...
 ];
 
-function calcFuel(int $distance, array &$lookup): int
-{
-    if (isset($lookup[$distance])) {
-        return $lookup[$distance];
-    }
-    $sum = calcFuel($distance - 1, $lookup) + $distance;
-    return $lookup[$distance] = $sum;
-}
-
 $result = [];
 for ($pos = $min; $pos <= $max; $pos++) {
     $sum = 0;
     foreach ($input as $crabPos) {
         $distance = abs($pos - $crabPos);
-        $fuel = calcFuel($distance, $lookup);
+        $fuel = $lookup[$distance] ??= (int)($distance / 2 + (($distance ** 2) / 2));
         $sum += $fuel;
     }
     $result[$pos] = $sum;
