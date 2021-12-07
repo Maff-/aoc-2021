@@ -27,3 +27,42 @@ for ($pos = $min; $pos <= $max; $pos++) {
 $minFuel = min($result);
 
 echo '[Part 1] Fuel spent aligning: ', $minFuel, \PHP_EOL;
+
+// Part 2
+
+$max = max($input);
+$min = min($input);
+
+$lookup = [
+    0 => 0,
+    1 => 1,
+    2 => 3,
+    3 => 6,
+    4 => 10,
+    5 => 15,
+    // ...
+];
+
+function calcFuel(int $distance, array &$lookup): int
+{
+    if (isset($lookup[$distance])) {
+        return $lookup[$distance];
+    }
+    $sum = calcFuel($distance - 1, $lookup) + $distance;
+    return $lookup[$distance] = $sum;
+}
+
+$result = [];
+for ($pos = $min; $pos <= $max; $pos++) {
+    $sum = 0;
+    foreach ($input as $crabPos) {
+        $distance = abs($pos - $crabPos);
+        $fuel = calcFuel($distance, $lookup);
+        $sum += $fuel;
+    }
+    $result[$pos] = $sum;
+}
+
+$minFuel = min($result);
+
+echo '[Part 2] Fuel spent aligning: ', $minFuel, \PHP_EOL;
