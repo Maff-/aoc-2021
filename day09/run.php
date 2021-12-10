@@ -19,7 +19,7 @@ $input = array_map(static fn(array $row) => array_map('intval', $row), array_map
 
 $height = count($input);
 $width = count($input[0]);
-$directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+const DIRECTIONS = [[-1, 0], [0, 1], [1, 0], [0, -1]];
 
 $riskSum = 0;
 
@@ -27,7 +27,7 @@ for ($y = 0; $y < $height; $y++) {
     for ($x = 0; $x < $width; $x++) {
         $depth = $input[$y][$x];
         $lowest = true;
-        foreach ($directions as [$dY, $dX]) {
+        foreach (DIRECTIONS as [$dY, $dX]) {
             $adjacent = $input[$y + $dY][$x + $dX] ?? null;
             if ($adjacent !== null && $adjacent <= $depth) {
                 $lowest = false;
@@ -41,3 +41,40 @@ for ($y = 0; $y < $height; $y++) {
 }
 
 echo '[Part 1] sum of the risk levels of all low points: ', $riskSum, \PHP_EOL;
+
+function mapBasins(int $x, int $y, array $map, array &$result, array &$sizes, int $n = 0): void
+{
+    $depth = $map[$y][$x] ?? null;
+    if ($depth === null) {
+        return;
+    }
+    if ($depth === 9) {
+        $result[$y][$x] = false;
+        return;
+    }
+    if (($result[$y][$x] ?? null) === null) {
+        $result[$y][$x] = $n;
+        $sizes[$n] ??= 0;
+        $sizes[$n]++;
+    }
+    foreach (DIRECTIONS as [$dY, $dX]) {
+        if (($result[$y + $dY][$x + $dX] ?? null) === null) {
+            mapBasins($x + $dX, $y + $dY, $map, $result, $sizes, $n);
+        }
+    }
+}
+
+$basinMap = [];
+$basinSizes = [];
+
+for ($y = 0; $y < $height; $y++) {
+    for ($x = 0; $x < $width; $x++) {
+        $basic = (array_key_last($basinSizes) ?? -1) + 1;
+        mapBasins($x, $y, $input, $basinMap, $basinSizes, $basic);
+    }
+}
+
+rsort($basinSizes);
+$product = array_product(array_slice($basinSizes, 0, 3));
+
+echo '[Part 2] product of the three largest basins sizes: ', $product, \PHP_EOL;
