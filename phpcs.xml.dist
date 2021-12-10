@@ -14,6 +14,9 @@
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
         <exclude-pattern>*/run.php</exclude-pattern>
     </rule>
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*/run.php</exclude-pattern>
+    </rule>
 
     <file>./</file>
     <exclude-pattern>vendor/*</exclude-pattern>
