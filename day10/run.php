@@ -43,6 +43,10 @@ class ParserException extends \RuntimeException
     }
 }
 
+class UnexpectedEndParserException extends ParserException
+{
+}
+
 function parse(string $code, int $pos, string $until): ?int
 {
     for ($len = strlen($code); $pos < $len; $pos++) {
@@ -61,8 +65,7 @@ function parse(string $code, int $pos, string $until): ?int
             throw new ParserException($until, $char, $pos);
         }
     }
-    // unexpected end?
-    return null;
+    throw new UnexpectedEndParserException($until, null, $pos);
 }
 
 $score = 0;
@@ -71,6 +74,7 @@ foreach ($input as $n => $line) {
     $firstChar = $line[0];
     try {
         parse($line, 1, PAIRS[$firstChar]);
+    } catch (UnexpectedEndParserException) {
     } catch (ParserException $e) {
         $score += $points = $scoreLookup[$e->found];
 //        echo sprintf('Parse exception at line %d; %s -> %d points', $n + 1, $e->getMessage(), $points), \PHP_EOL;
@@ -78,3 +82,43 @@ foreach ($input as $n => $line) {
 }
 
 echo '[Part 1] total syntax error score: ', $score, \PHP_EOL;
+
+// Part 2
+
+$scoreLookup = [
+    ')' => 1,
+    ']' => 2,
+    '}' => 3,
+    '>' => 4,
+];
+
+$scores = [];
+
+foreach ($input as $n => $line) {
+    $score = 0;
+    $pos = 0;
+    while (true) {
+        $char = $line[$pos];
+        $len = strlen($line);
+        try {
+            $lastPos = parse($line, $pos + 1, PAIRS[$char]);
+            if ($lastPos === $len - 1) {
+                break;
+            }
+            $pos = $lastPos + 1;
+        } catch (UnexpectedEndParserException $e) {
+            $line .= $e->expected;
+            $score = ($score * 5) + $scoreLookup[$e->expected];
+        } catch (ParserException) {
+            continue 2;
+        }
+    }
+    if ($score !== 0) {
+        $scores[] = $score;
+    }
+}
+
+sort($scores);
+$score = $scores[(count($scores) - 1) / 2];
+
+echo '[Part 2] middle auto complete score: ', $score, \PHP_EOL;
