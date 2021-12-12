@@ -53,3 +53,31 @@ $paths = [];
 walk('start', ['start'], $paths);
 
 echo '[Part 1] paths through the cave system that visit small caves at most once: ', count($paths), \PHP_EOL;
+
+// Part 2
+
+function walk2(string $current, array $path, array &$paths): void
+{
+    global $connections;
+
+    if ($current === 'end') {
+        $paths[] = $path;
+        return;
+    }
+
+    $visitCount = array_count_values(array_filter($path, static fn($node) => $node !== 'start' && ctype_lower($node)));
+    $visitedSmallCaveTwice = $visitCount && max($visitCount) > 1;
+    $options = array_values(array_filter(
+        $connections[$current],
+        static fn(string $option) => ctype_upper($option) || !$visitedSmallCaveTwice || !in_array($option, $path, true)
+    ));
+
+    foreach ($options as $option) {
+        walk2($option, [...$path, $option], $paths);
+    }
+}
+
+$paths = [];
+walk2('start', ['start'], $paths);
+
+echo '[Part 2] paths through the cave system: ', count($paths), \PHP_EOL;
