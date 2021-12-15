@@ -38,7 +38,6 @@ $pairs = array_combine(array_column($pairs, 0), array_column($pairs, 1));
 $steps = 10;
 $polymer = $template;
 
-$replacements = array_combine(array_keys($pairs), array_map(static fn(string $pair, string $insertion) => $pair[0] . $insertion . $pair[1], array_keys($pairs), $pairs));
 
 for ($step = 1; $step <= $steps; $step++) {
     $tmp = '';
@@ -56,3 +55,42 @@ ksort($elementCount);
 $result = array_key_last($elementCount) - array_key_first($elementCount);
 
 echo '[Part 1] quantity of the most common element minus the quantity of the least common element: ', $result, \PHP_EOL;
+
+// Part 2 - a more efficient way
+
+$steps = 40;
+$polymer = $template;
+
+$elementCount = array_count_values(str_split($polymer));
+$pairCount = [];
+for ($i = 0, $max = strlen($polymer) - 1; $i < $max; $i++) {
+    $pair = $polymer[$i] . $polymer[$i + 1];
+    $pairCount[$pair] ??= 0;
+    $pairCount[$pair]++;
+}
+
+for ($step = 1; $step <= $steps; $step++) {
+    $tmp = [];
+    foreach ($pairCount as $pair => $count) {
+        if (!$count) {
+            continue;
+        }
+        $insertion = $pairs[$pair];
+        $elementCount[$insertion] ??= 0;
+        $elementCount[$insertion] += $count;
+
+        $pairA = $pair[0] . $insertion;
+        $pairB = $insertion . $pair[1];
+        $tmp[$pairA] ??= 0;
+        $tmp[$pairA] += $count;
+        $tmp[$pairB] ??= 0;
+        $tmp[$pairB] += $count;
+    }
+    $pairCount = $tmp;
+}
+
+$elementCount = array_flip($elementCount);
+ksort($elementCount);
+$result = array_key_last($elementCount) - array_key_first($elementCount);
+
+echo '[Part 2] quantity of the most common element minus the quantity of the least common element: ', $result, \PHP_EOL;
