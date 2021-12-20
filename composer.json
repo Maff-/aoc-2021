@@ -1,7 +1,7 @@
 {
     "name": "maff/aoc-2021",
     "description": "Advent of Code 2021",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "license": "mit",
     "authors": [
         {
@@ -10,9 +10,15 @@
         }
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "ext-ds": "^1.4"
     },
     "require-dev": {
-        "slevomat/coding-standard": "7.x-dev"
+        "slevomat/coding-standard": "^7.0",
+        "php-ds/php-ds": "^1.4",
+        "symfony/stopwatch": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {"Maff\\Aoc\\": "src/"}
     }
 }
